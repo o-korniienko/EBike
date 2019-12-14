@@ -9,11 +9,9 @@ import java.util.*;
 
 public class BikeService {
 
-    public Comparator<Bike> byBrand = Comparator.comparingInt(o -> o.getBrand().hashCode());
-    public Comparator<Bike> byPrice = (o1, o2) -> (int) (o1.getPrice() - o2.getPrice());
+    private Comparator<Bike> byBrand = Comparator.comparingInt(o -> o.getBrand().hashCode());
+    private Comparator<Bike> byPrice = (o1, o2) -> (int) (o1.getPrice() - o2.getPrice());
     private Set<Bike> bikes = new TreeSet<>(byBrand.thenComparing(byPrice));
-    private Set<FoldingBike> foldingBikes = new TreeSet<>(byBrand.thenComparing(byPrice));
-    private Set<ElectricSpeedBike> electricSpeedBikes = new TreeSet<>(byBrand.thenComparing(byPrice));
 
     public Set<Bike> getBikes() {
         return bikes;
@@ -40,7 +38,6 @@ public class BikeService {
                     bike.setColor(words[5].trim());
                     bike.setPrice(Integer.parseInt(words[6].trim()));
                     bikes.add(bike);
-                    foldingBikes.add(bike);
                 } else {
                     ElectricSpeedBike bike = new ElectricSpeedBike();
                     String brand = words[0];
@@ -56,7 +53,6 @@ public class BikeService {
                     bike.setColor(words[5]);
                     bike.setPrice(Integer.parseInt(words[6].trim()));
                     bikes.add(bike);
-                    electricSpeedBikes.add(bike);
                 }
 
             }
@@ -107,7 +103,6 @@ public class BikeService {
         System.out.println("A color");
         bike.setColor(scanner1.next());
         bikes.add(bike);
-        foldingBikes.add(bike);
     }
 
     public void addNewSpeedOrElectricBike(int n) {
@@ -155,7 +150,6 @@ public class BikeService {
         System.out.println("A color");
         bike.setColor(scanner1.next());
         bikes.add(bike);
-        electricSpeedBikes.add(bike);
     }
 
     public void findFirstItem() {
@@ -180,17 +174,19 @@ public class BikeService {
     public void saveBikes(String fileName) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
             String line;
-            for (FoldingBike bike : foldingBikes) {
-                line = bike.getBrand() + "; " + bike.getSizeOfWheels() + "; " + bike.getNumberOfGears() + "; " +
-                        bike.getWeight() + "; " + bike.isLightsAvailability() + "; " + bike.getColor() + "; "
-                        + bike.getPrice();
-                bw.write(line + '\n');
-            }
-            for (ElectricSpeedBike bike : electricSpeedBikes) {
-                line = bike.getBrand() + "; " + bike.getMaxSpeed() + "; " + bike.getWeight() + "; "
-                        + bike.isLightsAvailability() + "; " + bike.getBatteryCapacity() + "; " + bike.getColor() + "; "
-                        + bike.getPrice();
-                bw.write(line + '\n');
+
+            for (Bike bike : bikes) {
+                if (bike.getBrand().contains("FOLDING BIKE")){
+                    line = bike.getBrand() + "; " + ((FoldingBike) bike).getSizeOfWheels() + "; " + ((FoldingBike) bike).getNumberOfGears() + "; " +
+                            bike.getWeight() + "; " + bike.isLightsAvailability() + "; " + bike.getColor() + "; "
+                            + bike.getPrice();
+                    bw.write(line + '\n');
+                }else{
+                    line = bike.getBrand() + "; " + ((ElectricSpeedBike)bike).getMaxSpeed() + "; " + bike.getWeight() + "; "
+                            + bike.isLightsAvailability() + "; " + ((ElectricSpeedBike) bike).getBatteryCapacity() + "; " + bike.getColor() + "; "
+                            + bike.getPrice();
+                    bw.write(line + '\n');
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
